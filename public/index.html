@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Music Jam 🎵</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .room-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"], input[type="url"] {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            placeholder-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .audio-controls {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .track-info {
+            margin-bottom: 15px;
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        .playback-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .seek-bar {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .connection-status {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .connected {
+            background: rgba(34, 197, 94, 0.3);
+        }
+        
+        .disconnected {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        .leader-badge {
+            background: rgba(251, 191, 36, 0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Realtime Music Jam 🎵</h1>
+            <p>Listen to music together in perfect sync</p>
+        </div>
+        
+        <div id="connectionStatus" class="connection-status disconnected">
+            Connecting to server...
+        </div>
+        
+        <div class="room-controls">
+            <input type="text" id="roomInput" placeholder="Enter room ID (e.g., 'party123')" value="room1">
+            <button id="joinBtn">Join Room</button>
+        </div>
+        
+        <div class="status">
+            <div>
+                <strong>Room:</strong> <span id="currentRoom">Not joined</span>
+            </div>
+            <div>
+                <strong>Users:</strong> <span id="userCount">0</span>
+            </div>
+            <div id="leaderBadge" class="leader-badge" style="display: none;">
+                👑 Leader
+            </div>
+        </div>
+        
+        <div class="audio-controls">
+            <div class="track-info">
+                <div><strong>Track:</strong></div>
+                <div id="currentTrack">No track loaded</div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <input type="url" id="trackInput" placeholder="Enter audio URL (e.g., https://example.com/song.mp3)">
+                <button id="loadTrackBtn" disabled>Load Track</button>
+            </div>
+            
+            <div class="playback-controls">
+                <button id="playBtn" disabled>▶️ Play</button>
+                <button id="pauseBtn" disabled>⏸️ Pause</button>
+            </div>
+            
+            <div class="seek-bar">
+                <input type="range" id="seekBar" min="0" max="100" value="0" disabled>
+            </div>
+            
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            
+            <audio id="audioPlayer" style="display: none;"></audio>
+        </div>
+        
+        <div class="instructions">
+            <strong>How to use:</strong><br>
+            1. Enter a room ID and click "Join Room"<br>
+            2. The first person in the room becomes the leader (👑)<br>
+            3. Leaders can load tracks and control playback<br>
+            4. All users hear the same audio synchronized in real-time<br>
+            5. Try opening multiple browser tabs to test synchronization!
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+</body>
+</html>
