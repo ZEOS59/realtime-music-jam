@@ -180,6 +180,30 @@ io.on('connection', (socket) => {
   });
 });
 
+// YouTube audio streaming endpoint
+app.get('/youtube-audio/:videoId', async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const url = `https://www.youtube.com/watch?v=${videoId}`;
+    
+    if (!ytdl.validateURL(url)) {
+      return res.status(400).json({ error: 'Invalid YouTube URL' });
+    }
+    
+    const info = await ytdl.getInfo(url);
+    const format = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+    
+    res.json({ 
+      audioUrl: format.url,
+      title: info.videoDetails.title,
+      duration: info.videoDetails.lengthSeconds
+    });
+  } catch (error) {
+    console.error('YouTube extraction error:', error);
+    res.status(500).json({ error: 'Failed to extract audio' });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', rooms: rooms.size });
