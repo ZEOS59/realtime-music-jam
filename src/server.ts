@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
+import ytdl from 'ytdl-core';
 
 const app = express();
 const server = createServer(app);
@@ -10,7 +11,9 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  transports: ['polling', 'websocket'],
+  allowEIO3: true
 });
 
 const PORT = process.env.PORT || 3000;
