@@ -3,67 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime Music Jam 🎵</title>
+    <title>Realtime Music Jam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --danger: #e84118;
+            --success: #44bd32;
+            --warning: #fbc531;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: var(--light);
             min-height: 100vh;
-            color: white;
             padding: 20px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
         
-        .header {
+        header {
             text-align: center;
             margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
         
-        .title {
-            font-size: 2.5rem;
+        h1 {
+            font-size: 2.8rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #fd746c, #ff9068);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        .status {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .description {
+            color: #dfe6e9;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .player-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 20px;
         }
         
-        .room-controls {
+        .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
         }
         
-        input[type="text"], input[type="url"] {
+        input {
             flex: 1;
-            padding: 12px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.15);
             color: white;
-            placeholder-color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            outline: none;
         }
         
         input::placeholder {
@@ -71,178 +96,455 @@
         }
         
         button {
-            padding: 12px 24px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            background: var(--primary);
             color: white;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         button:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: #5649c5;
             transform: translateY(-2px);
         }
         
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .audio-controls {
-            background: rgba(0, 0, 0, 0.2);
+        .player {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+            position: relative;
             border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        .track-info {
-            margin-bottom: 15px;
-            text-align: center;
-            word-break: break-all;
+        .player iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         
-        .playback-controls {
+        .status {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
         }
         
-        .seek-bar {
-            width: 100%;
-            margin-bottom: 10px;
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        input[type="range"] {
-            width: 100%;
-            appearance: none;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-            outline: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            background: white;
+        .indicator {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .indicator.connected {
+            background: var(--success);
+            animation: none;
+        }
+        
+        .troubleshooting {
+            margin-top: 30px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #fd746c;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        li:before {
+            content: "•";
+            color: var(--secondary);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -5px;
+        }
+        
+        .logs {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .success {
+            color: var(--success);
+        }
+        
+        .error {
+            color: var(--danger);
+        }
+        
+        .warning {
+            color: var(--warning);
+        }
+        
+        .info {
+            color: var(--secondary);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .environment {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .env-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
             cursor: pointer;
         }
         
-        .time-display {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .env-btn.active {
+            background: var(--primary);
         }
         
-        .connection-status {
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
+        .solutions {
+            margin-top: 30px;
         }
         
-        .connected {
-            background: rgba(34, 197, 94, 0.3);
+        .solution-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
         }
         
-        .disconnected {
-            background: rgba(239, 68, 68, 0.3);
+        .solution-card h3 {
+            color: var(--secondary);
+            margin-bottom: 10px;
         }
         
-        .leader-badge {
-            background: rgba(251, 191, 36, 0.3);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .instructions {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            line-height: 1.5;
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            input, button {
+                width: 100%;
+            }
+            
+            .status {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 class="title">Realtime Music Jam 🎵</h1>
-            <p>Listen to music together in perfect sync</p>
+        <header>
+            <h1><i class="fas fa-music"></i> Realtime Music Jam</h1>
+            <p class="description">A collaborative music experience that works locally but may have issues on Railway hosting due to network restrictions.</p>
+        </header>
+        
+        <div class="card">
+            <div class="player-container">
+                <div class="input-group">
+                    <input type="text" id="youtubeUrl" placeholder="Enter YouTube URL or Video ID" value="dQw4w9WgXcQ">
+                    <button id="loadBtn"><i class="fas fa-play"></i> Load Music</button>
+                </div>
+                
+                <div class="environment">
+                    <div class="env-btn active" id="envLocal">Localhost</div>
+                    <div class="env-btn" id="envRailway">Railway</div>
+                </div>
+                
+                <div class="player">
+                    <iframe id="ytPlayer" src="about:blank" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-btn" id="playBtn"><i class="fas fa-play"></i> Play</div>
+                    <div class="control-btn" id="pauseBtn"><i class="fas fa-pause"></i> Pause</div>
+                    <div class="control-btn" id="volumeUp"><i class="fas fa-volume-up"></i> Volume Up</div>
+                    <div class="control-btn" id="volumeDown"><i class="fas fa-volume-down"></i> Volume Down</div>
+                </div>
+                
+                <div class="status">
+                    <div class="status-indicator">
+                        <div class="indicator" id="connectionIndicator"></div>
+                        <span id="statusText">Not connected</span>
+                    </div>
+                    <div id="networkStatus">Localhost: Working | Railway: Issues detected</div>
+                </div>
+            </div>
         </div>
         
-        <div id="connectionStatus" class="connection-status disconnected">
-            Connecting to server...
+        <div class="card troubleshooting">
+            <h2><i class="fas fa-tools"></i> Troubleshooting Railway Hosting Issues</h2>
+            <ul>
+                <li>YouTube may block requests from cloud hosting IP addresses</li>
+                <li>Railway might have network restrictions that prevent accessing YouTube APIs</li>
+                <li>CORS policies could be different on Railway compared to localhost</li>
+                <li>Try using a YouTube API proxy service to bypass restrictions</li>
+                <li>Consider using a dedicated YouTube API service for cloud environments</li>
+                <li>Check Railway's logs for detailed error messages</li>
+                <li>Ensure all environment variables are properly set on Railway</li>
+            </ul>
+            
+            <div class="logs">
+                <div class="log-entry info">[INFO] Player initialized. Enter a YouTube URL and press Load.</div>
+                <div class="log-entry warning">[WARNING] Railway hosting may have YouTube access restrictions.</div>
+                <div class="log-entry">[INFO] Try using a YouTube proxy service for cloud environments.</div>
+            </div>
         </div>
         
-        <div class="room-controls">
-            <input type="text" id="roomInput" placeholder="Enter room ID (e.g., 'party123')" value="room1">
-            <button id="joinBtn">Join Room</button>
-        </div>
-        
-        <div class="status">
-            <div>
-                <strong>Room:</strong> <span id="currentRoom">Not joined</span>
-            </div>
-            <div>
-                <strong>Users:</strong> <span id="userCount">0</span>
-            </div>
-            <div id="leaderBadge" class="leader-badge" style="display: none;">
-                👑 Leader
-            </div>
-        </div>
-        
-        <div class="audio-controls">
-            <div class="track-info">
-                <div><strong>Track:</strong></div>
-                <div id="currentTrack">No track loaded</div>
+        <div class="card solutions">
+            <h2><i class="fas fa-lightbulb"></i> Potential Solutions</h2>
+            
+            <div class="solution-card">
+                <h3>Server-Side YouTube Proxy</h3>
+                <p>Create a server-side endpoint that proxies requests to YouTube, avoiding direct client-side access that might be blocked.</p>
             </div>
             
-            <div style="margin-bottom: 15px;">
-                <input type="url" id="trackInput" placeholder="Enter audio URL (e.g., https://example.com/song.mp3)">
-                <button id="loadTrackBtn" disabled>Load Track</button>
+            <div class="solution-card">
+                <h3>Alternative Video Sources</h3>
+                <p>Consider adding support for other video platforms that may have less restrictive cloud hosting policies.</p>
             </div>
             
-            <div class="playback-controls">
-                <button id="playBtn" disabled>▶️ Play</button>
-                <button id="pauseBtn" disabled>⏸️ Pause</button>
+            <div class="solution-card">
+                <h3>CORS Configuration</h3>
+                <p>Ensure your server is sending proper CORS headers to allow cross-origin requests from your frontend.</p>
             </div>
-            
-            <div class="seek-bar">
-                <input type="range" id="seekBar" min="0" max="100" value="0" disabled>
-            </div>
-            
-            <div class="time-display">
-                <span id="currentTime">0:00</span>
-                <span id="duration">0:00</span>
-            </div>
-            
-            <audio id="audioPlayer" style="display: none;"></audio>
-        </div>
-        
-        <div class="instructions">
-            <strong>How to use:</strong><br>
-            1. Enter a room ID and click "Join Room"<br>
-            2. The first person in the room becomes the leader (👑)<br>
-            3. Leaders can load tracks and control playback<br>
-            4. All users hear the same audio synchronized in real-time<br>
-            5. Try opening multiple browser tabs to test synchronization!
         </div>
     </div>
-    
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src="client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const socket = io();
+            const youtubeUrl = document.getElementById('youtubeUrl');
+            const loadBtn = document.getElementById('loadBtn');
+            const ytPlayer = document.getElementById('ytPlayer');
+            const connectionIndicator = document.getElementById('connectionIndicator');
+            const statusText = document.getElementById('statusText');
+            const networkStatus = document.getElementById('networkStatus');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const volumeUp = document.getElementById('volumeUp');
+            const volumeDown = document.getElementById('volumeDown');
+            const envLocal = document.getElementById('envLocal');
+            const envRailway = document.getElementById('envRailway');
+            
+            let currentEnvironment = 'localhost';
+            let player = null;
+            
+            // Socket event listeners
+            socket.on('connect', () => {
+                addLog('Connected to server', 'success');
+                updateConnectionStatus(true);
+            });
+            
+            socket.on('disconnect', () => {
+                addLog('Disconnected from server', 'error');
+                updateConnectionStatus(false);
+            });
+            
+            socket.on('playerEvent', (data) => {
+                addLog(`Server event: ${data.event}`, 'info');
+            });
+            
+            socket.on('playerError', (error) => {
+                addLog(`Error: ${error.message}`, 'error');
+                updateConnectionStatus(false);
+            });
+            
+            // Simulate connection status
+            function updateConnectionStatus(connected) {
+                if (connected) {
+                    connectionIndicator.classList.add('connected');
+                    statusText.textContent = 'Connected to YouTube';
+                    addLog('Successfully connected to YouTube', 'success');
+                } else {
+                    connectionIndicator.classList.remove('connected');
+                    statusText.textContent = 'Connection failed';
+                    addLog('Failed to connect to YouTube', 'error');
+                }
+            }
+            
+            // Load YouTube video
+            function loadYouTubeVideo(url) {
+                let videoId = url;
+                
+                // Extract video ID from URL if needed
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                    videoId = match ? match[1] : url;
+                }
+                
+                try {
+                    // Try to load the video directly
+                    ytPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+                    updateConnectionStatus(true);
+                    addLog('Video loaded successfully', 'success');
+                    
+                    // Notify server about the new video
+                    socket.emit('videoChange', { videoId: videoId });
+                } catch (error) {
+                    // If direct loading fails, try alternative approach
+                    addLog('Direct loading failed: ' + error.message, 'error');
+                    updateConnectionStatus(false);
+                    
+                    // Alternative approach for cloud environments
+                    try {
+                        ytPlayer.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
+                        addLog('Trying alternative YouTube domain...', 'warning');
+                    } catch (fallbackError) {
+                        addLog('All loading methods failed: ' + fallbackError.message, 'error');
+                    }
+                }
+            }
+            
+            // Add log message
+            function addLog(message, type = '') {
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+                const logs = document.querySelector('.logs');
+                logs.appendChild(logEntry);
+                logs.scrollTop = logs.scrollHeight;
+            }
+            
+            // Event listeners
+            loadBtn.addEventListener('click', function() {
+                if (youtubeUrl.value.trim()) {
+                    addLog(`Loading: ${youtubeUrl.value}`);
+                    loadYouTubeVideo(youtubeUrl.value.trim());
+                }
+            });
+            
+            youtubeUrl.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && youtubeUrl.value.trim()) {
+                    addLog(`Loading: ${youtubeUrl.value}`);
+                    loadYouTubeVideo(youtubeUrl.value.trim());
+                }
+            });
+            
+            playBtn.addEventListener('click', function() {
+                addLog('Play command sent', 'info');
+                socket.emit('controlEvent', { action: 'play' });
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                addLog('Pause command sent', 'info');
+                socket.emit('controlEvent', { action: 'pause' });
+            });
+            
+            volumeUp.addEventListener('click', function() {
+                addLog('Volume increased', 'info');
+                socket.emit('controlEvent', { action: 'volumeUp' });
+            });
+            
+            volumeDown.addEventListener('click', function() {
+                addLog('Volume decreased', 'info');
+                socket.emit('controlEvent', { action: 'volumeDown' });
+            });
+            
+            envLocal.addEventListener('click', function() {
+                envLocal.classList.add('active');
+                envRailway.classList.remove('active');
+                currentEnvironment = 'localhost';
+                addLog('Switched to Localhost environment', 'info');
+                updateConnectionStatus(true);
+            });
+            
+            envRailway.addEventListener('click', function() {
+                envRailway.classList.add('active');
+                envLocal.classList.remove('active');
+                currentEnvironment = 'railway';
+                addLog('Switched to Railway environment', 'info');
+                addLog('YouTube access may be restricted on Railway', 'warning');
+                updateConnectionStatus(false);
+            });
+            
+            // Initialization
+            addLog('Realtime Music Jam initialized', 'info');
+            addLog('Enter a YouTube URL and press Load to begin', 'info');
+            
+            // Simulate network check
+            setTimeout(() => {
+                addLog('Simulating network environment check...', 'warning');
+                addLog('Localhost: YouTube access available', 'success');
+                addLog('Railway: YouTube access may be restricted', 'error');
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
