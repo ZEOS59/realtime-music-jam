@@ -416,8 +416,12 @@
                 updateConnectionStatus(false);
             });
             
+            socket.on('connected', (data) => {
+                addLog(`Server: ${data.message}`, 'success');
+            });
+            
             socket.on('playerEvent', (data) => {
-                addLog(`Server event: ${data.event}`, 'info');
+                addLog(`Server: ${data.event}`, 'info');
             });
             
             socket.on('playerError', (error) => {
@@ -465,8 +469,10 @@
                     try {
                         ytPlayer.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
                         addLog('Trying alternative YouTube domain...', 'warning');
+                        socket.emit('videoChange', { videoId: videoId });
                     } catch (fallbackError) {
                         addLog('All loading methods failed: ' + fallbackError.message, 'error');
+                        socket.emit('playerError', { message: 'All loading methods failed' });
                     }
                 }
             }
